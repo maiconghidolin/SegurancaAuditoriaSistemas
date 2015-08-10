@@ -7,3 +7,12 @@ C:\Users\Maicon Ghidolin\Dropbox\Ciencias da computação\8º Semestre\Seguranç
 C:\Users\Maicon Ghidolin\Dropbox\Ciencias da computação\8º Semestre\Segurança\Trabalho1\Trabalho1\obj\Debug\Trabalho1.exe
 C:\Users\Maicon Ghidolin\Dropbox\Ciencias da computação\8º Semestre\Segurança\Trabalho1\Trabalho1\obj\Debug\Trabalho1.xml
 C:\Users\Maicon Ghidolin\Dropbox\Ciencias da computação\8º Semestre\Segurança\Trabalho1\Trabalho1\obj\Debug\Trabalho1.pdb
+C:\Users\Maicon Ghidolin\Dropbox\Ciencias da computação\8º Semestre\Segurança\SegurancaAuditoriaSistemas\Trabalho1\Trabalho1\bin\Debug\Trabalho1.exe.config
+C:\Users\Maicon Ghidolin\Dropbox\Ciencias da computação\8º Semestre\Segurança\SegurancaAuditoriaSistemas\Trabalho1\Trabalho1\obj\Debug\Trabalho1.exe
+C:\Users\Maicon Ghidolin\Dropbox\Ciencias da computação\8º Semestre\Segurança\SegurancaAuditoriaSistemas\Trabalho1\Trabalho1\obj\Debug\Trabalho1.xml
+C:\Users\Maicon Ghidolin\Dropbox\Ciencias da computação\8º Semestre\Segurança\SegurancaAuditoriaSistemas\Trabalho1\Trabalho1\obj\Debug\Trabalho1.pdb
+C:\Users\Maicon Ghidolin\Dropbox\Ciencias da computação\8º Semestre\Segurança\SegurancaAuditoriaSistemas\Trabalho1\Trabalho1\bin\Debug\Trabalho1.exe
+C:\Users\Maicon Ghidolin\Dropbox\Ciencias da computação\8º Semestre\Segurança\SegurancaAuditoriaSistemas\Trabalho1\Trabalho1\bin\Debug\Trabalho1.pdb
+C:\Users\Maicon Ghidolin\Dropbox\Ciencias da computação\8º Semestre\Segurança\SegurancaAuditoriaSistemas\Trabalho1\Trabalho1\bin\Debug\Trabalho1.xml
+C:\Users\Maicon Ghidolin\Dropbox\Ciencias da computação\8º Semestre\Segurança\SegurancaAuditoriaSistemas\Trabalho1\Trabalho1\obj\Debug\Trabalho1.Resources.resources
+C:\Users\Maicon Ghidolin\Dropbox\Ciencias da computação\8º Semestre\Segurança\SegurancaAuditoriaSistemas\Trabalho1\Trabalho1\obj\Debug\Trabalho1.vbproj.GenerateResource.Cache

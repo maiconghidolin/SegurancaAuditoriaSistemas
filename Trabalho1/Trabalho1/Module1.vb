@@ -69,175 +69,150 @@ Module Module1
             Dim Chave = Console.ReadLine()
             CifraDeVigenere(Caminho, Chave, Acao)
         ElseIf Tipo = TipoCifra.Substituicao Then
-            Console.WriteLine("Digite o caminho do texto considerado como alfabeto!")
-            Dim CaminhoAlfabeto = Console.ReadLine()
-            CifraDeSubstituicao(Caminho, CaminhoAlfabeto, Acao)
+            CifraDeSubstituicao(Caminho, Acao)
         End If
 
         Console.ReadLine()
     End Sub
 
     Sub CifraDeCeasar(ByVal Caminho As String, ByVal Chave As Integer, ByVal Acao As Acao)
-        Dim ListaLinhas = LerArquivo(Caminho)
-        Dim NovaLista As New List(Of String)
-        For Each obj In ListaLinhas
-            Dim LinhaCriptografada As String = ""
-            For Each caractere In obj
-                Dim CaractereAsc As Integer = Asc(caractere) ' Converte para integer.
-                Dim CaractereChar As Char
-                If Acao = Trabalho1.Acao.Cifrar Then
-                    CaractereChar = Chr(((CaractereAsc + Chave) Mod 256)) ' Converte para char.
-                ElseIf Acao = Trabalho1.Acao.Descifrar Then
-                    CaractereChar = Chr(((CaractereAsc - Chave) Mod 256)) ' Converte para char.
-                End If
-                LinhaCriptografada &= CaractereChar
-            Next
-            NovaLista.Add(LinhaCriptografada)
+        Dim Texto = LerArquivo(Caminho)
+        Dim LinhaCriptografada As String = ""
+        For Each caractere In Texto
+            Dim CaractereAsc As Integer = Asc(caractere) ' Converte para integer.
+            Dim CaractereChar As Char
+            If Acao = Trabalho1.Acao.Cifrar Then
+                CaractereChar = Chr(((CaractereAsc + Chave) Mod 256)) ' Converte para char.
+            ElseIf Acao = Trabalho1.Acao.Descifrar Then
+                CaractereChar = Chr(((CaractereAsc - Chave) Mod 256)) ' Converte para char.
+            End If
+            LinhaCriptografada &= CaractereChar
         Next
         Console.WriteLine("Digite o caminho para escrever o arquivo gerado!")
         Dim CaminhoGerado = Console.ReadLine()
-        EscreverArquivo(NovaLista, CaminhoGerado)
+        EscreverArquivo(LinhaCriptografada, CaminhoGerado)
     End Sub
 
     Sub CifraDeTransposicao(ByVal Caminho As String, ByVal Chave As Integer, ByVal Acao As Acao)
-        Dim ListaLinhas = LerArquivo(Caminho)
-        Dim NovaLista As New List(Of String)
-        For Each obj In ListaLinhas
-            If Acao = Trabalho1.Acao.Descifrar Then
-                Chave = obj.Count / Chave
+        Dim texto = LerArquivo(Caminho)
+        If Acao = Trabalho1.Acao.Descifrar Then
+            Chave = texto.Count / Chave
+        End If
+        Dim LinhaCriptografada As String = ""
+        Dim i As Integer = -1
+        Dim matriz(Chave) As String
+        For Each caractere In texto
+            i += 1
+            If i > Chave - 1 Then
+                i = 0
             End If
-            Dim matriz(Chave) As String
-            Dim LinhaCriptografada As String = ""
-            Dim i As Integer = -1
-            For Each caractere In obj
-                i += 1
-                If i > Chave - 1 Then
-                    i = 0
-                End If
-                matriz(i) &= caractere
-            Next
-
-            For j As Integer = i + 1 To Chave - 1
-                matriz(j) &= " "
-            Next
-            For Each j In matriz
-                LinhaCriptografada += j
-            Next
-            NovaLista.Add(LinhaCriptografada)
+            matriz(i) &= caractere
+        Next
+        For j As Integer = i + 1 To Chave - 1
+            matriz(j) &= " "
+        Next
+        For Each j In matriz
+            LinhaCriptografada += j
         Next
         Console.WriteLine("Digite o caminho para escrever o arquivo gerado!")
         Dim CaminhoGerado = Console.ReadLine()
-        EscreverArquivo(NovaLista, CaminhoGerado)
+        EscreverArquivo(LinhaCriptografada, CaminhoGerado)
     End Sub
 
     Sub CifraDeVigenere(ByVal Caminho As String, ByVal Chave As String, ByVal Acao As Acao)
-        Dim ListaLinhas = LerArquivo(Caminho)
-        Dim NovaLista As New List(Of String)
-
+        Dim texto = LerArquivo(Caminho)
         Dim chaveInt() As Integer = (From obj In Chave Select Asc(obj)).ToArray
-
-        For Each obj In ListaLinhas
-            Dim LinhaCriptografada As String = ""
-            Dim i As Integer = -1
-            For Each caractere In obj
-                i += 1
-                If i > chaveInt.Count - 1 Then
-                    i = 0
-                End If
-
-                Dim CaractereAsc As Integer = Asc(caractere)
-                Dim CaractereChar As Char
-                If Acao = Trabalho1.Acao.Cifrar Then
-                    CaractereChar = Chr(((CaractereAsc + chaveInt(i)) Mod 256))
-                ElseIf Acao = Trabalho1.Acao.Descifrar Then
-                    CaractereChar = Chr(((CaractereAsc - chaveInt(i)) Mod 256))
-                End If
-
-                LinhaCriptografada &= CaractereChar
-            Next
-            NovaLista.Add(LinhaCriptografada)
+        Dim LinhaCriptografada As String = ""
+        Dim i As Integer = -1
+        For Each caractere In texto
+            i += 1
+            If i > chaveInt.Count - 1 Then
+                i = 0
+            End If
+            Dim CaractereAsc As Integer = Asc(caractere)
+            Dim CaractereChar As Char
+            If Acao = Trabalho1.Acao.Cifrar Then
+                CaractereChar = Chr(((CaractereAsc + chaveInt(i)) Mod 256))
+            ElseIf Acao = Trabalho1.Acao.Descifrar Then
+                CaractereChar = Chr(((CaractereAsc - chaveInt(i)) Mod 256))
+            End If
+            LinhaCriptografada &= CaractereChar
         Next
         Console.WriteLine("Digite o caminho para escrever o arquivo gerado!")
         Dim CaminhoGerado = Console.ReadLine()
-        EscreverArquivo(NovaLista, CaminhoGerado)
+        EscreverArquivo(LinhaCriptografada, CaminhoGerado)
     End Sub
 
-    Sub CifraDeSubstituicao(ByVal Caminho As String, ByVal CaminhoAlfabeto As String, ByVal Acao As Acao)
-        Dim ListaLinhas = LerArquivo(Caminho)
-        Dim NovaLista As New List(Of String)
-        Dim Alfabeto = LerArquivo(CaminhoAlfabeto)
-
+    Sub CifraDeSubstituicao(ByVal Caminho As String, ByVal Acao As Acao)
+        Dim texto = LerArquivo(Caminho)
+        Dim Alfabeto = CriaAlfabeto()
+        Dim LinhaCriptografada As String = ""
         If Acao = Trabalho1.Acao.Cifrar Then
-            Dim cloneAlfabeto = LerArquivo(CaminhoAlfabeto)
-            Dim NovoAlfabeto As New List(Of String)
+            Dim cloneAlfabeto = (From obj In Alfabeto Select obj).tolist()
+            Dim NovoAlfabeto As String = ""
             Dim rand As New Random()
-
             For i = 0 To Alfabeto.Count - 1
                 Dim Index As Integer = rand.Next(cloneAlfabeto.Count)
-                NovoAlfabeto.Add(cloneAlfabeto(Index))
+                NovoAlfabeto &= Chr(cloneAlfabeto(Index))
                 cloneAlfabeto.RemoveAt(Index)
             Next
-
-            For Each obj In ListaLinhas
-                Dim LinhaCriptografada As String = ""
-                For Each caractere In obj
-                    Dim index = Alfabeto.IndexOf(caractere)
-                    LinhaCriptografada &= NovoAlfabeto(index)
-                Next
-                NovaLista.Add(LinhaCriptografada)
+            For Each caractere In texto
+                Dim index = Alfabeto.IndexOf(Asc(caractere))
+                LinhaCriptografada &= NovoAlfabeto(index)
             Next
-
             Console.WriteLine("Digite o caminho para escrever o alfabeto substituido!")
             Caminho = Console.ReadLine()
             EscreverArquivo(NovoAlfabeto, Caminho)
         Else
-
             Console.WriteLine("Digite o caminho do alfabeto substituido!")
             Caminho = Console.ReadLine()
             Dim AlfabetoSubstituido = LerArquivo(Caminho)
-
-            For Each obj In ListaLinhas
-                Dim LinhaCriptografada As String = ""
-                For Each caractere In obj
-                    Dim index = AlfabetoSubstituido.IndexOf(caractere)
-                    LinhaCriptografada &= Alfabeto(index)
-                Next
-                NovaLista.Add(LinhaCriptografada)
+            For Each caractere In texto
+                Dim index = AlfabetoSubstituido.IndexOf(caractere)
+                LinhaCriptografada &= Chr(Alfabeto(index))
             Next
-
         End If
-
         Console.WriteLine("Digite o caminho para escrever o arquivo gerado!")
         Caminho = Console.ReadLine()
-        EscreverArquivo(NovaLista, Caminho)
+        EscreverArquivo(LinhaCriptografada, Caminho)
     End Sub
 
 #Region "Manipuladores de Arquivos"
 
-    Function LerArquivo(ByVal caminho As String) As List(Of String)
+    Function LerArquivo(ByVal caminho As String) As String
         Dim Stream As New StreamReader(caminho)
-        Dim Linha As String = ""
-        Dim ListaLinhas As New List(Of String)
-        Do
-            Linha = Stream.ReadLine()
-            If Not Linha Is Nothing Then
-                ListaLinhas.Add(Linha)
-            End If
-        Loop Until Linha Is Nothing
+        Dim texto = Stream.ReadToEnd()
         Stream.Close()
-        Return ListaLinhas
+        Return texto
     End Function
 
-    Sub EscreverArquivo(ByVal texto As List(Of String), ByVal caminho As String)
-        Dim Stream As New StreamWriter(Caminho)
-        For Each obj In texto
-            Stream.WriteLine(obj)
-        Next
+    Sub EscreverArquivo(ByVal texto As String, ByVal caminho As String)
+        Dim Stream As New StreamWriter(caminho)
+        Stream.Write(texto)
         Stream.Close()
-        Console.WriteLine("Arquivo gerado em " & Caminho & ";")
+        Console.WriteLine("Arquivo gerado em " & caminho & ";")
     End Sub
+
+#End Region
+
+#Region "Outras Funções"
+
+    Function CriaAlfabeto() As List(Of Integer)
+        Dim Alfabeto As New List(Of Integer)
+        For i = 0 To 255
+            Alfabeto.Add(i)
+        Next
+        Return Alfabeto
+    End Function
 
 #End Region
 
 End Module
 
+'decrifar ceasar: pega o primeiro do cifrado - primeiro do normal
+
+'decifra trasnposição por força bruta..tenta todas as chaves possíveis
+
+'decifra  vigenere: le posição por posição diminuindo o cifrado do normal
+
+'decifra substituição: pega posição por posição, compara e monta a chave. primeira posição do normal é 'a' e a primeira do cifrado é 'z', então 'a' corresponde a 'z'.
