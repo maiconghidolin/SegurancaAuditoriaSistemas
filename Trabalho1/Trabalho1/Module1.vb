@@ -129,11 +129,15 @@ Module Module1
                 Continue For
             End If
 
+            Dim inicio = Timer
             Dim chaveTransp = VerificarChaveCifraTransposicao(ArquivosNormais(i), ArquivosCrip(i))
             If chaveTransp <> -1 Then
                 Console.WriteLine("Chave: " & chaveTransp)
                 Continue For
             End If
+            Dim fim = Timer
+            Console.WriteLine("Verificar chave de transposicao demorou " & fim - inicio & " segundos")
+
 
             Dim ChaveVigenere = VerificarChaveCifraVigenere(ArquivosNormais(i), ArquivosCrip(i))
             If ChaveVigenere <> "" Then
@@ -146,7 +150,60 @@ Module Module1
     End Sub
 
     Sub SomenteComArquivoCifrado()
+        Console.WriteLine("Digite o diretorio do arquivo das palavras!")
+        Dim CaminhoPalavras As String = Console.ReadLine()
+        Dim ArquivoPalavras = LerArquivo(CaminhoPalavras).Replace(vbCrLf, " ").Split(" ")
+        Dim Palavras As HashSet(Of String) = New HashSet(Of String)(ArquivoPalavras)
 
+        Dim continua = True
+        While continua
+            Console.WriteLine("Digite o caminho do arquivo criptografado!")
+            Dim CaminhoCifrado As String = Console.ReadLine()
+            Dim arquivoCriptografado = File.ReadAllBytes(CaminhoCifrado)
+
+            Dim Tipo As TipoCifra = 0
+            Console.WriteLine("Escolha o tipo da cifra:")
+            Console.WriteLine("1 - Cifra de Céasar;")
+            Console.WriteLine("2 - Cifra de Transposição;")
+            Console.WriteLine("3 - Cifra de Vigenère;")
+            Console.WriteLine("4 - Substituição;")
+            Tipo = CInt(Console.ReadLine())
+
+            If Tipo = TipoCifra.Ceasar Then
+                Dim chaveCeasar = VerificarChaveCifraCeasarForcaBruta(arquivoCriptografado, Palavras)
+                If chaveCeasar <> -1 Then
+                    Console.WriteLine("Chave: " & chaveCeasar)
+                Else
+                    Console.WriteLine("Chave não encontrada!")
+                End If
+            ElseIf Tipo = TipoCifra.Vigenere Then
+                Dim chaveVigenere = VerificarChaveCifraVigenereForcaBruta(arquivoCriptografado, Palavras)
+                If chaveVigenere IsNot Nothing Then
+                    Dim ch = (From obj In chaveVigenere Select Chr(obj)).ToArray
+                    Console.WriteLine("Chave: " & ch)
+                Else
+                    Console.WriteLine("Chave não encontrada!")
+                End If
+            ElseIf Tipo = TipoCifra.Transposicao Then
+                Dim chaveTransposicao = VerificarChaveCifraTransposicaoForcaBruta(arquivoCriptografado, Palavras)
+                If chaveTransposicao <> -1 Then
+                    Console.WriteLine("Chave: " & chaveTransposicao)
+                Else
+                    Console.WriteLine("Chave não encontrada!")
+                End If
+            ElseIf Tipo = TipoCifra.Substituicao Then
+                VerificarChaveCifraSubstituicaoForcaBruta(CaminhoCifrado, CaminhoPalavras)
+            ElseIf Tipo = 5 Then
+                testaGeracaoDeChave()
+            End If
+
+            Console.WriteLine("Escolher outro arquivo:")
+            Console.WriteLine("1 - Sim;")
+            Console.WriteLine("2 - Não;")
+            If Console.ReadLine() = 2 Then
+                continua = False
+            End If
+        End While
     End Sub
 
 #Region "Funções Para Cifrar e Descifrar"
@@ -195,6 +252,21 @@ Module Module1
             LinhaCriptografada.Add(CaractereChar)
         Next
         Return LinhaCriptografada
+    End Function
+
+    Function CifraDeCeasarForcaBruta(ByVal Arquivo() As Byte, ByVal Chave As Integer) As HashSet(Of String)
+        Dim LinhaCriptografada As New StringBuilder
+        For caractere = 3 To Arquivo.Count - 1 ' comeca no 3 por causa dos 3 caracteres estranhos no começo do arquivo
+            Dim CaractereAsc As Byte = Arquivo(caractere)
+            Dim AscDecifrado = (CaractereAsc - Chave) Mod 256
+            If AscDecifrado < 0 Then
+                AscDecifrado += 256
+            End If
+            LinhaCriptografada.Append(Chr(AscDecifrado))
+        Next
+
+        Dim qq = LinhaCriptografada.ToString.Replace(vbCrLf, " ").Split(" ")
+        Return New HashSet(Of String)(qq)
     End Function
 
     Function CifraDeTransposicao(ByVal Caminho As String, ByVal Chave As Integer, ByVal Acao As Acao, Optional ByVal EscreveArquivo As Boolean = True) As String
@@ -249,6 +321,24 @@ Module Module1
             LinhaCriptografada.AddRange(j)
         Next
         Return LinhaCriptografada
+    End Function
+
+    Function CifraDeTransposicaoForcaBruta(ByVal Arquivo() As Byte, ByVal Chave As Integer) As HashSet(Of String)
+        Chave = Arquivo.Count / Chave
+        Dim matriz(Chave - 1) As StringBuilder
+        For caractere = 0 To Arquivo.Count - 1
+            Dim index = caractere Mod Chave
+            If matriz(index) Is Nothing Then
+                matriz(index) = New StringBuilder
+            End If
+            matriz(index).Append(Chr(Arquivo(caractere)))
+        Next
+        Dim LinhaCriptografada As New StringBuilder
+        For Each j In matriz
+            LinhaCriptografada.Append(j)
+        Next
+        Dim qq = LinhaCriptografada.ToString.Trim().Replace(vbCrLf, " ").Split(" ")
+        Return New HashSet(Of String)(qq)
     End Function
 
     Function CifraDeVigenere(ByVal Caminho As String, ByVal Chave As String, ByVal Acao As Acao, Optional ByVal EscreveArquivo As Boolean = True) As String
@@ -310,6 +400,20 @@ Module Module1
         Return LinhaCriptografada
     End Function
 
+    Function CifraDeVigenereForcaBruta(ByVal Arquivo() As Byte, ByVal Chave As List(Of Byte)) As HashSet(Of String)
+        Dim LinhaCriptografada As New StringBuilder
+        For caractere = 3 To Arquivo.Count - 1 ' comeca no 3 por causa dos 3 caracteres estranhos no começo do arquivo
+            Dim CaractereAsc As Integer = Arquivo(caractere)
+            Dim AscDecifrado = (CaractereAsc - Chave(caractere Mod Chave.Count)) Mod 256
+            If AscDecifrado < 0 Then
+                AscDecifrado += 256
+            End If
+            LinhaCriptografada.Append(Chr(AscDecifrado))
+        Next
+        Dim qq = LinhaCriptografada.ToString.Replace(vbCrLf, " ").Split(" ")
+        Return New HashSet(Of String)(qq)
+    End Function
+
     Sub CifraDeSubstituicao(ByVal Caminho As String, ByVal Acao As Acao)
         Dim texto = LerArquivo(Caminho)
         Dim Alfabeto = CriaAlfabeto()
@@ -356,7 +460,14 @@ Module Module1
         Else
             For Each caractere In Arquivo
                 Dim index = AlfabetoCifrado.IndexOf(caractere)
-                LinhaCriptografada.Add(AlfabetoNormal(index))
+                'se -1, significa que n existe no alfabeto cifrado
+                'portanto nao existe no alfabeto normal
+                'entao se nao existe continua o mesmo caractere do cifrado
+                If index = -1 Then
+                    LinhaCriptografada.Add(caractere)
+                Else
+                    LinhaCriptografada.Add(AlfabetoNormal(index))
+                End If
             Next
         End If
         Return LinhaCriptografada
@@ -391,8 +502,11 @@ Module Module1
 
         Dim Chave As Integer = -1
         For i = 1 To arquivoCriptografado.Count
+            Dim inicio = Timer
             Dim novaChave As Integer = arquivoCriptografado.Count / i
             Dim retorno = CifraDeTransposicaoArquivoBytes(arquivoCriptografado, novaChave)
+            Dim fim = Timer
+            Console.WriteLine("Chave " & i & " demorou " & fim - inicio & " segundos")
             If arquivoNormal.Except(retorno).Count <= 0 Then
                 Chave = i
                 Exit For
@@ -455,6 +569,142 @@ Module Module1
 
     End Function
 
+    Function VerificarChaveCifraCeasarForcaBruta(ByVal Arquivo() As Byte, ByVal Palavras As HashSet(Of String)) As Integer
+        For chave = 0 To 255
+            Dim retorno = CifraDeCeasarForcaBruta(Arquivo, chave)
+            If retorno.IsSubsetOf(Palavras) Then
+                Return chave
+            End If
+        Next
+        Return -1
+    End Function
+
+    Function VerificarChaveCifraTransposicaoForcaBruta(ByVal Arquivo() As Byte, ByVal Palavras As HashSet(Of String)) As Integer
+        For chave = 1 To Arquivo.Count
+            Dim retorno = CifraDeTransposicaoForcaBruta(Arquivo, chave)
+            If retorno.IsSubsetOf(Palavras) Then
+                Return chave
+            End If
+        Next
+        Return -1
+    End Function
+
+    Function VerificarChaveCifraVigenereForcaBruta(ByVal Arquivo() As Byte, ByVal Palavras As HashSet(Of String)) As List(Of Byte)
+
+        Console.WriteLine("Descifrar com:")
+        Console.WriteLine("1 - Letras;")
+        Console.WriteLine("2 - Números;")
+        Dim DecifrarCom = Console.ReadLine()
+
+        Dim inicio As Integer
+        Dim fim As Integer
+        If DecifrarCom = 1 Then
+            inicio = 97
+            fim = 122
+        Else
+            inicio = 48
+            fim = 57
+        End If
+
+        Dim chave As New List(Of Byte)
+        chave.Add(inicio)
+
+        While chave IsNot Nothing
+            Dim retorno = CifraDeVigenereForcaBruta(Arquivo, chave)
+            If retorno.IsSubsetOf(Palavras) Then
+                Return chave
+            End If
+            chave = GeraProximaChaveVigenere(chave, inicio, fim)
+        End While
+
+        Return Nothing
+    End Function
+
+    Sub VerificarChaveCifraSubstituicaoForcaBruta(ByVal CaminhoCriptografado As String, ByVal CaminhoPalavras As String)
+        Console.WriteLine("Descifrar com:")
+        Console.WriteLine("1 - Triplas;")
+        Console.WriteLine("2 - Padrão;")
+        Dim DecifrarCom = Console.ReadLine()
+        Dim TriplasCifradas As New Dictionary(Of String, Integer)
+        Dim TriplasDicionario As New Dictionary(Of String, Integer)
+        Dim Alfabeto As New Dictionary(Of Char, StringBuilder)
+        Dim arquivoCifrado = LerArquivo(CaminhoCriptografado)
+        Dim arquivoDicionario = LerArquivo(CaminhoPalavras)
+        If DecifrarCom = 1 Then 'tripla
+
+            GeraDicionarioFrequencias(arquivoCifrado, TriplasCifradas)
+            GeraDicionarioFrequencias(arquivoDicionario, TriplasDicionario)
+            Dim TriplasCifradasOrdenadas = (From item In TriplasCifradas Order By item.Value Descending Select item.Key).ToList
+            Dim TriplasDicionarioOrdenadas = (From item In TriplasDicionario Order By item.Value Descending Select item.Key).ToList
+
+            Console.WriteLine("Digite a tripla de início:")
+            Dim inicio As Integer = Console.ReadLine()
+            Console.WriteLine("Digite a tripla de fim:")
+            Dim fim As Integer = Console.ReadLine()
+
+            If fim > TriplasCifradasOrdenadas.Count - 1 Then
+                fim = TriplasCifradasOrdenadas.Count - 1
+            End If
+
+            If fim > TriplasDicionarioOrdenadas.Count - 1 Then
+                fim = TriplasDicionarioOrdenadas.Count - 1
+            End If
+
+            For j = inicio To fim
+                AdicionarPalavraNoAlfabeto(TriplasCifradasOrdenadas(j), TriplasDicionarioOrdenadas(j), Alfabeto)
+            Next
+
+            Dim arquivoCriptografado = File.ReadAllBytes(CaminhoCriptografado)
+            Dim contador(Alfabeto.Count - 1) As Integer
+
+            While True
+                Dim AlfabetoCifrado As New List(Of Byte)
+                Dim AlfabetoNormal As New List(Of Byte)
+
+                Dim continua = GeraProximaChaveSubstituicao(AlfabetoCifrado, AlfabetoNormal, Alfabeto, contador)
+
+                Dim retorno = CifraDeSubstituicaoArquivoBytes(arquivoCriptografado, AlfabetoNormal, AlfabetoCifrado, Acao.Descifrar)
+                Dim ch = (From obj In retorno Select Chr(obj)).ToArray
+                Console.WriteLine(ch)
+
+                If Not continua Then
+                    Exit While
+                End If
+
+            End While
+
+        Else 'padrao
+
+            Dim palavras = arquivoDicionario.Replace(vbCrLf, " ").Split(" ")
+            Dim HashPalavras As HashSet(Of String) = New HashSet(Of String)(palavras)
+            'ordena pela palavra de menor tamanho
+            'as maiores tem mais chances de serem unicas
+            Dim palavrasOrdenadas = (From p In HashPalavras Order By p.Count Ascending Select p).ToArray()
+
+            'pode acontecer de letras n serem mapeadas
+            GeraAlfabetoPorPadroes(palavrasOrdenadas, arquivoCifrado, Alfabeto)
+
+            Dim arquivoCriptografado = File.ReadAllBytes(CaminhoCriptografado)
+            Dim contador(Alfabeto.Count - 1) As Integer
+
+            While True
+                Dim AlfabetoCifrado As New List(Of Byte)
+                Dim AlfabetoNormal As New List(Of Byte)
+
+                Dim continua = GeraProximaChaveSubstituicao(AlfabetoCifrado, AlfabetoNormal, Alfabeto, contador)
+
+                Dim retorno = CifraDeSubstituicaoArquivoBytes(arquivoCriptografado, AlfabetoNormal, AlfabetoCifrado, Acao.Descifrar)
+
+                Dim ch = (From qq In retorno Select Chr(qq)).ToArray
+                Console.WriteLine(ch)
+
+                If Not continua Then
+                    Exit While
+                End If
+            End While
+        End If
+    End Sub
+
 #End Region
 
 #Region "Manipuladores de Arquivos"
@@ -485,9 +735,169 @@ Module Module1
         Return Alfabeto
     End Function
 
+    Function GeraProximaChaveVigenere(ByVal Chave As List(Of Byte), ByVal inicio As Integer, ByVal fim As Integer) As List(Of Byte)
+        Dim j = Chave.Count - 1
+        While j >= 0
+            If Chave(j) <> fim Then
+                Chave(j) += 1
+                Return Chave
+            Else
+                Chave(j) = inicio
+                j -= 1
+            End If
+        End While
+        Chave.Add(inicio)
+        Return Chave
+    End Function
+
+    Function CalculaPadraoPalavras(ByVal palavra As String) As String
+        Dim contador = 0
+        Dim hash As New Dictionary(Of Char, Short)
+        Dim retorno As String = ""
+        For Each obj In palavra
+            Dim valor As Short
+            If hash.TryGetValue(obj, valor) Then
+                retorno &= valor
+            Else
+                hash.Add(obj, contador)
+                retorno &= contador
+                contador += 1
+            End If
+        Next
+        Return retorno
+    End Function
+
+    Sub AdicionarPalavraNoAlfabeto(ByVal chave As String, ByVal valor As String, ByRef Alfabeto As Dictionary(Of Char, StringBuilder), Optional ByVal unico As Boolean = False)
+        For i = 0 To chave.Count - 1
+            Dim lista As New StringBuilder
+            If Alfabeto.TryGetValue(chave(i), lista) Then
+                'se for unica quer dizer que achou a palavra certa
+                'entao limpa a lista de possibilidades daquela letra e insere essa unica
+                If unico Then
+                    lista.Clear()
+                    lista.Append(valor(i))
+                Else
+                    If lista.ToString.IndexOf(valor(i)) = -1 Then
+                        lista.Append(valor(i))
+                    End If
+                End If
+            Else
+                lista = New StringBuilder
+                lista.Append(valor(i))
+                Alfabeto.Add(chave(i), lista)
+            End If
+        Next
+    End Sub
+
+    Sub GeraDicionarioFrequencias(ByVal texto As String, ByRef Dicionario As Dictionary(Of String, Integer))
+        Dim inicio = 0
+        Dim fim = inicio + 3
+        Dim tamanho = 3
+        Dim iniciot = Timer
+        While fim <= texto.Count
+            Dim tripla = texto.Substring(inicio, tamanho)
+            Dim valor As Integer
+            If Dicionario.TryGetValue(tripla, valor) Then
+                Dicionario(tripla) = valor + 1
+            Else
+                Dicionario.Add(tripla, 1)
+            End If
+            inicio += 1
+            fim += 1
+        End While
+        Dim fimt = Timer
+        Console.WriteLine(fimt - iniciot)
+    End Sub
+
+    Sub GeraAlfabetoPorPadroes(ByVal palavras() As String, ByVal texto As String, ByRef Alfabeto As Dictionary(Of Char, StringBuilder))
+        For Each obj In palavras
+            Dim padrao = CalculaPadraoPalavras(obj)
+            Dim inicio = 0
+            Dim fim = inicio + obj.Count
+            Dim tamanho = obj.Count
+            Dim Frequencia As New Dictionary(Of String, Integer)
+            While fim <= texto.Count
+                Dim palavra = texto.Substring(inicio, tamanho)
+                Dim padraoCifrado = CalculaPadraoPalavras(palavra)
+                If padrao = padraoCifrado Then
+                    Dim valor As Integer
+                    If Frequencia.TryGetValue(palavra, valor) Then
+                        Frequencia(palavra) = valor + 1
+                    Else
+                        Frequencia.Add(palavra, 1)
+                    End If
+                End If
+                inicio += 1
+                fim += 1
+            End While
+
+            If Frequencia.Count = 1 Then
+                AdicionarPalavraNoAlfabeto(Frequencia.Keys(0), obj, Alfabeto, True)
+            Else
+                Dim FrequenciasOrdenadas = (From item In Frequencia Order By item.Value Descending Select item.Key).ToList
+                If FrequenciasOrdenadas.Count > 0 Then
+                    AdicionarPalavraNoAlfabeto(FrequenciasOrdenadas(0), obj, Alfabeto, False)
+                End If
+            End If
+        Next
+    End Sub
+
+    Function GeraProximaChaveSubstituicao(ByRef AlfabetoCifrado As List(Of Byte), ByRef AlfabetoNormal As List(Of Byte), ByRef Dicionario As Dictionary(Of Char, StringBuilder), ByRef Contador() As Integer) As Boolean
+        Dim incrementa = True
+        For obj = 0 To Dicionario.Count - 1
+            Dim key = Dicionario.Keys.ElementAt(obj)
+            AlfabetoCifrado.Add(Asc(key))
+            Dim index = Contador(obj)
+            Dim value = Dicionario.Values.ElementAt(obj)
+            AlfabetoNormal.Add(Asc(value(index)))
+            If incrementa Then
+                If obj = Dicionario.Count - 1 Then
+                    If Contador(obj) = value.ToString.Count - 1 Then
+                        Return False
+                    End If
+                End If
+
+                If Contador(obj) = value.ToString.Count - 1 Then
+                    Contador(obj) = 0
+                    incrementa = True
+                Else
+                    Contador(obj) += 1
+                    incrementa = False
+                End If
+            End If
+        Next
+        Return True
+    End Function
+
+    Sub testaGeracaoDeChave()
+        Dim Alfabeto As New Dictionary(Of Char, StringBuilder)
+        Alfabeto.Add("a", New StringBuilder("1234"))
+        Alfabeto.Add("b", New StringBuilder("12"))
+        Alfabeto.Add("c", New StringBuilder("1"))
+
+        Dim contador(Alfabeto.Count - 1) As Integer
+
+        While True
+            Dim AlfabetoCifrado As New List(Of Byte)
+            Dim AlfabetoNormal As New List(Of Byte)
+
+            Dim continua = GeraProximaChaveSubstituicao(AlfabetoCifrado, AlfabetoNormal, Alfabeto, contador)
+
+            For obj = 0 To AlfabetoCifrado.Count - 1
+                Console.Write(Chr(AlfabetoCifrado(obj)) & " - " & Chr(AlfabetoNormal(obj)) & "; ")
+            Next
+            Console.WriteLine()
+
+            If Not continua Then
+                Exit While
+            End If
+
+        End While
+
+    End Sub
+
 #End Region
 
 End Module
 
-
-'set hash
+'sql injection - seminario

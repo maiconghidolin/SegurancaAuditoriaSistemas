@@ -7,5 +7,3 @@ C:\Users\Maicon Ghidolin\Dropbox\Ciencias da computação\8º Semestre\Seguranç
 C:\Users\Maicon Ghidolin\Dropbox\Ciencias da computação\8º Semestre\Segurança\SegurancaAuditoriaSistemas\Trabalho1\Trabalho1\obj\Release\Trabalho1.exe
 C:\Users\Maicon Ghidolin\Dropbox\Ciencias da computação\8º Semestre\Segurança\SegurancaAuditoriaSistemas\Trabalho1\Trabalho1\obj\Release\Trabalho1.xml
 C:\Users\Maicon Ghidolin\Dropbox\Ciencias da computação\8º Semestre\Segurança\SegurancaAuditoriaSistemas\Trabalho1\Trabalho1\obj\Release\Trabalho1.pdb
-C:\Users\Maicon Ghidolin\Dropbox\Ciencias da computação\8º Semestre\Segurança\SegurancaAuditoriaSistemas\Trabalho1\Trabalho1\bin\Release\Trabalho1.exe.CodeAnalysisLog.xml
-C:\Users\Maicon Ghidolin\Dropbox\Ciencias da computação\8º Semestre\Segurança\SegurancaAuditoriaSistemas\Trabalho1\Trabalho1\bin\Release\Trabalho1.exe.lastcodeanalysissucceeded
