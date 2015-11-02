@@ -1,0 +1,3 @@
+C:\Users\Maicon Ghidolin\Dropbox\Ciencias da computação\8º Semestre\Segurança\SegurancaAuditoriaSistemas\UDPClient\UDPClient\bin\Debug\UDPClient.exe.config
+C:\Users\Maicon Ghidolin\Dropbox\Ciencias da computação\8º Semestre\Segurança\SegurancaAuditoriaSistemas\UDPClient\UDPClient\obj\Debug\UDPClient.Resources.resources
+C:\Users\Maicon Ghidolin\Dropbox\Ciencias da computação\8º Semestre\Segurança\SegurancaAuditoriaSistemas\UDPClient\UDPClient\obj\Debug\UDPClient.vbproj.GenerateResource.Cache
